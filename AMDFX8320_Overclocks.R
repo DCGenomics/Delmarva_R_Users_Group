@@ -21,14 +21,14 @@ GetLMFormula<-function(LM_List,Digits,Whitespace) {
                  paste(signif(LM_List[[1]][2],digits=Digits),'x',sep=''),
                  '+',
                  signif(LM_List[[1]][1],digits=Digits),sep=SEP) 
-           )
+    )
   } else {
     return(paste('y',
                  '=',
                  paste(signif(LM_List[[1]][2],digits=Digits),'x',sep=''),
                  '-',
                  signif(abs(LM_List[[1]][1]),digits=Digits),sep=SEP)
-           )
+    )
   }
 }
 
@@ -63,7 +63,8 @@ SolveUnkAbs<-function(LM_List,KnownConc,Digits) {
   names(tmp)<-'Absorbance'
   return(tmp)
 }
-
+####
+# raw data entry
 speed<-c(rep(3.5,times=10),
          rep(3.6,times=3),
          rep(3.7,times=3),
@@ -72,7 +73,7 @@ speed<-c(rep(3.5,times=10),
          rep(4.0,times=4),
          rep(4.1,times=3),
          rep(4.2,times=6)
-         )
+)
 multiplier<-c(rep(17.5,times=10),
               rep(18,times=3),
               rep(18.5,times=3),
@@ -81,7 +82,7 @@ multiplier<-c(rep(17.5,times=10),
               rep(20,times=4),
               rep(20.5,times=3),
               rep(21,times=6)
-         )
+)
 load<-c(0,
         rep(100,times=6),
         NA,NA,
@@ -94,7 +95,7 @@ load<-c(0,
         100,100,
         NA,
         rep(100,times=18)
-        )
+)
 stability<-c(rep("S",times=6),#S: stable, U: unstable
              rep("U",times=3),
              "S",
@@ -121,7 +122,7 @@ CPUTINtemp<-c(NA,NA,45,45,NA,43,43,NA,NA,45,NA,46,47,NA,47,49,NA,48,49,NA,49,49,
               NA,50,51,NA,51,52,53,53,53)
 watts<-c(99,183,179,178,176,174,174,NA,NA,174,NA,179,181,NA,NA,190,NA,195,196,NA,205,206,202,210,205,210,213,218,216,
          NA,215,216,NA,NA,224,228,228,228)
-#
+
 Data<-data.frame(stability=stability,
                  speed=speed,
                  multiplier=multiplier,
@@ -130,16 +131,18 @@ Data<-data.frame(stability=stability,
                  CPUTINtemp=CPUTINtemp,
                  CPUtemps=CPUtemps,
                  load=load)
-                 suppressPackageStartupMessages(require(xtable))
-                 
+#####
+# make some xtables
+suppressPackageStartupMessages(require(xtable))
+
 print(xtable(Data,NA.string = "NA",caption = "All recorded data. Stability; S = Stable, U = Unstable. Temperature = degress Celsius. Load = percentage of processor usage."))
 #JUST VALUES FROM STABLE SETTINGS
 Data_stable<-subset(Data,subset=(stability=="S"))
 
 #JUST THE MINIMUM VOLTAGES NEEDED TO REACH STABILITY
 StableMinmumVoltages<-Data_stable[Data_stable$voltage == ave(x=Data_stable$voltage,
-                                       Data_stable$speed,
-                                       FUN=min), ]
+                                                             Data_stable$speed,
+                                                             FUN=min), ]
 
 #LINEAR MODEL OF STABLE VOLTAGES AGAINST SPEEDS
 LM_SpeedVolts<-lm(voltage~speed,data=StableMinmumVoltages)
@@ -155,7 +158,7 @@ Data_fullload<-subset(Data,subset=(load=="100"))
 LM_tempvolts<-lm(CPUtemps~voltage,data=Data_fullload)
 signif(summary(LM_tempvolts)$r.squared,digits=4)
 formula_tempvolts<-GetLMFormula(LM_List = LM_tempvolts,Digits = 4,Whitespace = T)
-
+#####
 #plots
 plot(voltage~speed,
      data=StableMinmumVoltages,
@@ -189,6 +192,7 @@ legend("bottomright",
        legend=formula_tempvolts,
        title=as.expression(bquote(R^2==.(signif(summary(LM_tempvolts)$r.squared,digits=4)))),
        box.lty=0)
+#######
 ### save PDF copies of each
 pdf(file='/home/kellys/AMD8320_clocks/Volts_Speed.pdf',width=8,height=8)
 plot(voltage~speed,
@@ -225,8 +229,8 @@ corrgram(Data,
 corrgram(StableMinmumVoltages,
          upper.panel=panel.conf,
          lower.panel=panel.pts)
-         
-         
+
+#######
 suppressPackageStartupMessages(require(xtable))
 
 #print xtable for TeX output
